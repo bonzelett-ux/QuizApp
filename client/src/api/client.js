@@ -23,4 +23,18 @@ apiClient.interceptors.request.use(
   }
 );
 
+// Handle 401 Unauthorized globally by clearing auth cache and forcing redirect
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      // Redirect to login page
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default apiClient;

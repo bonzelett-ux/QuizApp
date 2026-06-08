@@ -39,6 +39,12 @@ router.get('/questions', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'count must be between 5 and 20' });
     }
 
+    // Verify category exists
+    const categoryRows = await db.query('SELECT id FROM categories WHERE id = ?', [categoryId]);
+    if (categoryRows.length === 0) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+
     // Fetch randomized questions from DB
     const questions = await db.query(
       `SELECT id, category_id, difficulty, question_text, correct_answer, wrong_answer_1, wrong_answer_2, wrong_answer_3 
@@ -80,8 +86,25 @@ router.post('/quiz/submit', authMiddleware, async (req, res) => {
     const { categoryId, answers } = req.body;
     const userId = req.user.userId;
 
-    if (!categoryId || !Array.isArray(answers) || answers.length === 0) {
+    if (isNaN(parseInt(categoryId, 10)) || !Array.isArray(answers) || answers.length === 0) {
       return res.status(400).json({ error: 'Invalid submission format' });
+    }
+
+    if (answers.length < 5 || answers.length > 20) {
+      return res.status(400).json({ error: 'Answers count must be between 5 and 20' });
+    }
+
+    // Validate that category exists
+    const categoryRows = await db.query('SELECT id FROM categories WHERE id = ?', [categoryId]);
+    if (categoryRows.length === 0) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+
+    // Validate structure of each answer
+    for (const ans of answers) {
+      if (typeof ans !== 'object' || isNaN(parseInt(ans.questionId, 10)) || typeof ans.selectedAnswer !== 'string') {
+        return res.status(400).json({ error: 'Each answer must have a numeric questionId and string selectedAnswer' });
+      }
     }
 
     let correctCount = 0;

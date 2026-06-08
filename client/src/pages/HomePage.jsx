@@ -108,26 +108,56 @@ const HomePage = () => {
         <h2 className="setup-title">2. Select Question Count</h2>
         <div className="count-selector">
           <div className="count-header">
-            <span>Number of questions</span>
-            <span className="count-display">{questionCount}</span>
+            <span>Number of questions (5 - 20)</span>
+            <input
+              type="number"
+              min="5"
+              max="20"
+              value={questionCount}
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10);
+                setQuestionCount(isNaN(val) ? '' : val);
+              }}
+              style={{
+                width: '60px',
+                padding: '0.2rem',
+                borderRadius: '4px',
+                border: '1px solid var(--border-glass)',
+                background: 'var(--bg-dark)',
+                color: 'var(--text-primary)',
+                textAlign: 'center',
+                fontSize: '1rem',
+                fontWeight: 'bold'
+              }}
+            />
           </div>
           <input
             type="range"
             min="5"
             max="20"
-            value={questionCount}
+            value={typeof questionCount === 'number' ? questionCount : 10}
             onChange={(e) => setQuestionCount(parseInt(e.target.value, 10))}
             className="slider"
           />
+          {(questionCount < 5 || questionCount > 20 || questionCount === '') && (
+            <span style={{ color: 'var(--error)', fontSize: '0.85rem' }}>
+              ⚠ Question count must be a number between 5 and 20.
+            </span>
+          )}
         </div>
       </section>
 
       <button
         onClick={handlePlay}
-        disabled={!selectedCategory}
+        disabled={!selectedCategory || questionCount < 5 || questionCount > 20 || questionCount === ''}
         className="play-btn"
       >
-        {selectedCategory ? `Play ${selectedCategory.name} Quiz` : 'Select a Category to Start'}
+        {!selectedCategory 
+          ? 'Select a Category to Start' 
+          : (questionCount < 5 || questionCount > 20 || questionCount === '')
+            ? 'Fix Question Count'
+            : `Play ${selectedCategory.name} Quiz`
+        }
       </button>
     </div>
   );
