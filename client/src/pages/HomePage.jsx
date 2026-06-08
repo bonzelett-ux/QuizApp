@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../api/client';
+import ThemeSwitcher from '../components/ThemeSwitcher';
 import './Quiz.css';
 
 const categoryEmojis = {
@@ -69,9 +70,12 @@ const HomePage = () => {
           <span className="user-welcome">Logged in as</span>
           <span className="user-email">{user?.email}</span>
         </div>
-        <button onClick={logout} className="logout-btn">
-          Log Out
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+          <ThemeSwitcher />
+          <button onClick={logout} className="logout-btn">
+            Log Out
+          </button>
+        </div>
       </header>
 
       {error && <div className="alert alert-error">{error}</div>}

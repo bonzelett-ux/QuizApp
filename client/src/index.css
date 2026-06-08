@@ -16,6 +16,8 @@
   
   --success: #10b981;
   --success-glow: rgba(16, 185, 129, 0.15);
+  --success: #10b981;
+  --success-glow: rgba(16, 185, 129, 0.15);
   --error: #ef4444;
   --error-glow: rgba(239, 68, 68, 0.15);
   
@@ -25,6 +27,38 @@
   
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Ambient secondary glow variable */
+  --theme-ambient-2: rgba(168, 85, 247, 0.12);
+}
+
+/* Custom Themes */
+body.theme-indigo {
+  --primary: #6366f1;
+  --primary-glow: rgba(99, 102, 241, 0.15);
+  --primary-hover: #4f46e5;
+  --theme-ambient-2: rgba(168, 85, 247, 0.12);
+}
+
+body.theme-emerald {
+  --primary: #10b981;
+  --primary-glow: rgba(16, 185, 129, 0.15);
+  --primary-hover: #059669;
+  --theme-ambient-2: rgba(56, 189, 248, 0.12);
+}
+
+body.theme-crimson {
+  --primary: #ef4444;
+  --primary-glow: rgba(239, 68, 68, 0.15);
+  --primary-hover: #dc2626;
+  --theme-ambient-2: rgba(249, 115, 22, 0.12);
+}
+
+body.theme-cyberpunk {
+  --primary: #fbbf24;
+  --primary-glow: rgba(251, 191, 36, 0.15);
+  --primary-hover: #d97706;
+  --theme-ambient-2: rgba(236, 72, 153, 0.12);
 }
 
 * {
@@ -52,7 +86,7 @@ body::before {
   left: -10%;
   width: 50%;
   height: 60%;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
   z-index: -1;
   pointer-events: none;
 }
@@ -64,7 +98,7 @@ body::after {
   right: -10%;
   width: 50%;
   height: 60%;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--theme-ambient-2) 0%, transparent 70%);
   z-index: -1;
   pointer-events: none;
 }

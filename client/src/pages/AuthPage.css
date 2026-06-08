@@ -119,3 +119,31 @@
 .auth-footer a {
   font-weight: 600;
 }
+
+/* Custom password toggle styling */
+.password-toggle {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: color var(--transition-fast);
+  z-index: 10;
+}
+
+.password-toggle:hover {
+  color: var(--text-primary);
+}
+
+/* Hide default browser reveal buttons (IE, Edge) */
+.form-input::-ms-reveal,
+.form-input::-ms-clear {
+  display: none !important;
+}

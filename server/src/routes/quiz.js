@@ -45,29 +45,49 @@ router.get('/questions', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'Category not found' });
     }
 
-    // Fetch randomized questions from DB
+    // Fetch randomized questions from DB (fetch a larger pool to allow filtering duplicates)
     const questions = await db.query(
       `SELECT id, category_id, difficulty, question_text, correct_answer, wrong_answer_1, wrong_answer_2, wrong_answer_3 
        FROM questions 
        WHERE category_id = ? 
        ORDER BY RAND() 
-       LIMIT ${count}`,
+       LIMIT 100`,
       [categoryId]
     );
 
+    // Filter duplicates by normalizing question text
+    const seenTexts = new Set();
+    const uniqueQuestions = [];
+
+    for (const q of questions) {
+      // Normalize: strip " (Variant ID: X)" or " (ID: X)" anywhere before a question mark or end of string
+      const normalizedText = q.question_text.replace(/\s*\((Variant\s+)?ID:\s*\d+\)\s*(?=\?|$)/gi, '').trim().toLowerCase();
+      
+      if (!seenTexts.has(normalizedText)) {
+        seenTexts.add(normalizedText);
+        uniqueQuestions.push(q);
+      }
+      
+      if (uniqueQuestions.length === count) {
+        break;
+      }
+    }
+
     // Shuffle options for each question
-    const formattedQuestions = questions.map(q => {
+    const formattedQuestions = uniqueQuestions.map(q => {
       const answers = shuffle([
         q.correct_answer,
         q.wrong_answer_1,
         q.wrong_answer_2,
         q.wrong_answer_3
       ]);
+      // Normalize to strip "(Variant ID: X)" or "(ID: X)" so user doesn't see it
+      const cleanText = q.question_text.replace(/\s*\((Variant\s+)?ID:\s*\d+\)\s*(?=\?|$)/gi, '').trim();
       return {
         id: q.id,
         category_id: q.category_id,
         difficulty: q.difficulty,
-        question_text: q.question_text,
+        question_text: cleanText,
         correct_answer: q.correct_answer, // Expose for immediate feedback UX
         answers
       };
