@@ -30,7 +30,7 @@ const QuizPage = () => {
 
     const fetchQuestions = async () => {
       try {
-        const response = await apiClient.get(`/questions?categoryId=${categoryId}&count=${count}`);
+        const response = await apiClient.get(`/questions?categoryId=${categoryId}&count=${count}&_t=${Date.now()}`);
         setQuestions(response.data);
       } catch (err) {
         console.error('Error fetching questions:', err);
@@ -148,11 +148,42 @@ const QuizPage = () => {
 
       <div className="quiz-card">
         <div className="quiz-header">
-          <div className="quiz-info-row">
-            <span className="category-tag">{categoryName}</span>
-            <span className="question-progress">
-              Question {currentIndex + 1} of {totalQuestions}
-            </span>
+          <div className="quiz-info-row" style={{ marginBottom: '0.5rem' }}>
+            <button 
+              className="exit-btn"
+              onClick={() => {
+                if (window.confirm('Are you sure you want to exit the quiz? Your progress will be lost.')) {
+                  navigate('/');
+                }
+              }}
+              style={{
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                color: '#fca5a5',
+                padding: '0.4rem 0.8rem',
+                borderRadius: '6px',
+                fontSize: '0.85rem',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = 'var(--error)';
+                e.target.style.color = '#fff';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = 'rgba(239, 68, 68, 0.1)';
+                e.target.style.color = '#fca5a5';
+              }}
+            >
+              ← Exit Quiz
+            </button>
+            <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+              <span className="category-tag">{categoryName}</span>
+              <span className="question-progress">
+                Question {currentIndex + 1} of {totalQuestions}
+              </span>
+            </div>
           </div>
           <div className="progress-bar-container">
             <div className="progress-bar-fill" style={{ width: `${progressPercent}%` }}></div>

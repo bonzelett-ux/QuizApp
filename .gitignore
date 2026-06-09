@@ -35,3 +35,7 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Project Walkthrough file (Do not add to git)
+project_walkthrough.md
+

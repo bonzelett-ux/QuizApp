@@ -28,6 +28,7 @@ router.get('/categories', async (req, res) => {
 // 2. GET /api/questions (Protected)
 router.get('/questions', authMiddleware, async (req, res) => {
   try {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     const categoryId = parseInt(req.query.categoryId, 10);
     let count = parseInt(req.query.count || '10', 10);
 
