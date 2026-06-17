@@ -12,6 +12,16 @@ const ResultsPage = () => {
   const [historyLoading, setHistoryLoading] = useState(true);
   const [historyError, setHistoryError] = useState(null);
 
+  const formatDuration = (secs) => {
+    if (secs === null || secs === undefined) return '--';
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    if (m > 0) {
+      return `${m}m ${s}s`;
+    }
+    return `${s}s`;
+  };
+
   useEffect(() => {
     if (!result || !categoryId) return;
 
@@ -117,6 +127,13 @@ const ResultsPage = () => {
                 <span className="stat-lbl">Incorrect</span>
               </div>
             </div>
+            <div className="stat-item duration-stat">
+              <span className="stat-badge">⏱</span>
+              <div className="stat-text-group">
+                <span className="stat-val">{formatDuration(result.durationSeconds || result.duration_seconds)}</span>
+                <span className="stat-lbl">Time Taken</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -165,6 +182,7 @@ const ResultsPage = () => {
                     <tr>
                       <th>Date</th>
                       <th>Score</th>
+                      <th>Time</th>
                       <th>Correct / Total</th>
                     </tr>
                   </thead>
@@ -176,6 +194,7 @@ const ResultsPage = () => {
                           {attempt.id === result.id && <span className="current-indicator">Current</span>}
                         </td>
                         <td className="score-td">{attempt.score_percent}%</td>
+                        <td>{formatDuration(attempt.duration_seconds)}</td>
                         <td>{attempt.correct_count} / {attempt.total_questions}</td>
                       </tr>
                     ))}

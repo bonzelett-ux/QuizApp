@@ -17,6 +17,24 @@ const QuizPage = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [timeElapsed, setTimeElapsed] = useState(0);
+
+  // Timer Effect
+  useEffect(() => {
+    if (loading || submitting || questions.length === 0) return;
+
+    const interval = setInterval(() => {
+      setTimeElapsed(prev => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [loading, submitting, questions.length]);
+
+  const formatTime = (secs) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
 
   // Safely redirect if state is missing
   useEffect(() => {
@@ -111,7 +129,8 @@ const QuizPage = () => {
 
         const response = await apiClient.post('/quiz/submit', {
           categoryId,
-          answers: answersPayload
+          answers: answersPayload,
+          durationSeconds: timeElapsed
         });
 
         // Navigate to results page with response data
@@ -180,6 +199,7 @@ const QuizPage = () => {
             </button>
             <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
               <span className="category-tag">{categoryName}</span>
+              <span className="timer-badge">⏱️ {formatTime(timeElapsed)}</span>
               <span className="question-progress">
                 Question {currentIndex + 1} of {totalQuestions}
               </span>

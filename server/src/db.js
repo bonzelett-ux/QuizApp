@@ -14,6 +14,26 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+// Run database schema updates to ensure duration_seconds exists
+async function runAutoMigrations() {
+  try {
+    const [columns] = await pool.query(
+      `SHOW COLUMNS FROM quiz_results LIKE 'duration_seconds'`
+    );
+    if (columns.length === 0) {
+      console.log('Adding duration_seconds column to quiz_results table...');
+      await pool.query(
+        `ALTER TABLE quiz_results ADD COLUMN duration_seconds INT DEFAULT NULL`
+      );
+      console.log('duration_seconds column added successfully.');
+    }
+  } catch (err) {
+    // Table might not exist yet if seed/migration script hasn't run. That is fine.
+    console.log('Auto-migration notice: quiz_results table may not exist yet or connection is pending.');
+  }
+}
+runAutoMigrations();
+
 export default {
   query: async (sql, params) => {
     const [results] = await pool.query(sql, params);

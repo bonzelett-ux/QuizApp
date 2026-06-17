@@ -5,7 +5,9 @@ CREATE TABLE IF NOT EXISTS quiz_results (
   total_questions INT NOT NULL,
   correct_count INT NOT NULL,
   score_percent DECIMAL(5,2) NOT NULL,
+  duration_seconds INT DEFAULT NULL,
   played_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
+

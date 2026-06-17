@@ -104,7 +104,7 @@ router.get('/questions', authMiddleware, async (req, res) => {
 // 3. POST /api/quiz/submit (Protected)
 router.post('/quiz/submit', authMiddleware, async (req, res) => {
   try {
-    const { categoryId, answers } = req.body;
+    const { categoryId, answers, durationSeconds } = req.body;
     const userId = req.user.userId;
 
     if (isNaN(parseInt(categoryId, 10)) || !Array.isArray(answers) || answers.length === 0) {
@@ -149,17 +149,19 @@ router.post('/quiz/submit', authMiddleware, async (req, res) => {
     const scorePercent = parseFloat(((correctCount / totalQuestions) * 100).toFixed(2));
 
     // Save to quiz_results
+    const parsedDuration = isNaN(parseInt(durationSeconds, 10)) ? null : parseInt(durationSeconds, 10);
     await db.query(
-      `INSERT INTO quiz_results (user_id, category_id, total_questions, correct_count, score_percent)
-       VALUES (?, ?, ?, ?, ?)`,
-      [userId, categoryId, totalQuestions, correctCount, scorePercent]
+      `INSERT INTO quiz_results (user_id, category_id, total_questions, correct_count, score_percent, duration_seconds)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [userId, categoryId, totalQuestions, correctCount, scorePercent, parsedDuration]
     );
 
     res.status(200).json({
       correctCount,
       incorrectCount: totalQuestions - correctCount,
       scorePercent,
-      totalQuestions
+      totalQuestions,
+      durationSeconds: parsedDuration
     });
   } catch (err) {
     console.error('Error submitting quiz:', err);
@@ -172,7 +174,7 @@ router.get('/quiz/results', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.userId;
     const results = await db.query(
-      `SELECT qr.id, qr.category_id, qr.total_questions, qr.correct_count, qr.score_percent, qr.played_at, c.name AS category_name
+      `SELECT qr.id, qr.category_id, qr.total_questions, qr.correct_count, qr.score_percent, qr.duration_seconds, qr.played_at, c.name AS category_name
        FROM quiz_results qr
        JOIN categories c ON qr.category_id = c.id
        WHERE qr.user_id = ?
