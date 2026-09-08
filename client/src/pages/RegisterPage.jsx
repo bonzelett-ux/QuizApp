@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import apiClient from '../api/client';
 import './AuthPage.css';
 
@@ -12,6 +13,7 @@ const RegisterPage = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -30,9 +32,14 @@ const RegisterPage = () => {
     setLoading(true);
 
     try {
-      await apiClient.post('/auth/register', { email, password });
-      // Redirect to login page and pass status in location state
-      navigate('/login', { state: { registered: true } });
+      const response = await apiClient.post('/auth/register', { email, password });
+      // Automatically log in and navigate to homepage
+      if (response.data.token && response.data.user) {
+        login(response.data.token, response.data.user);
+        navigate('/');
+      } else {
+        navigate('/login', { state: { registered: true } });
+      }
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed. Try again.');
     } finally {
@@ -43,6 +50,11 @@ const RegisterPage = () => {
   return (
     <div className="auth-wrapper">
       <div className="auth-card">
+        <div className="auth-tabs">
+          <Link to="/login" className="auth-tab">Sign In</Link>
+          <Link to="/register" className="auth-tab active">Create Account</Link>
+        </div>
+
         <div className="auth-header">
           <h2>Create Account</h2>
           <p>Join us to test your trivia knowledge</p>

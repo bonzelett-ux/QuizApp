@@ -39,12 +39,28 @@ router.post('/register', async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 12);
 
     // Insert user
-    await db.query(
+    const result = await db.query(
       'INSERT INTO users (email, password_hash) VALUES (?, ?)',
       [email, passwordHash]
     );
 
-    res.status(201).json({ message: 'Account created' });
+    const userId = result.insertId;
+
+    // Auto-generate JWT token so registration immediately logs user in
+    const token = jwt.sign(
+      { userId, email },
+      process.env.JWT_SECRET || 'supersecretkeyfortriviaquizapp',
+      { expiresIn: '7d' }
+    );
+
+    res.status(201).json({
+      message: 'Account created',
+      token,
+      user: {
+        id: userId,
+        email
+      }
+    });
   } catch (err) {
     console.error('Registration error:', err);
     res.status(500).json({ error: 'Internal server error' });

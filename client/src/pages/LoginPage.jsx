@@ -35,6 +35,11 @@ const LoginPage = () => {
   return (
     <div className="auth-wrapper">
       <div className="auth-card">
+        <div className="auth-tabs">
+          <Link to="/login" className="auth-tab active">Sign In</Link>
+          <Link to="/register" className="auth-tab">Create Account</Link>
+        </div>
+
         <div className="auth-header">
           <h2>Welcome Back</h2>
           <p>Login to your account to start playing</p>
